@@ -1,9 +1,58 @@
-from django.db import models
 from django.db import IntegrityError
 import requests
 from .models import *
 
 def fetch_and_create():
+    url = 'http://api.football-data.org/v4/areas'
+    headers = {'X-Auth-Token': '0104ea3ca43a4bd2a32bf841c5c1e107'}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        # Handle the error here
+        return
+
+    data = response.json()
+
+    # Process parent areas
+    for areas_data in data['areas']:
+        try:
+            # Check if an object with this parentAreaId already exists
+            obj = parentArea.objects.filter(parentAreaId=areas_data['parentAreaId']).first()
+            if not obj:
+                # Create the object if it does not exist
+                parentArea.objects.create(
+                    parentAreaId=areas_data['parentAreaId'],
+                    parentArea=areas_data['parentArea'],
+                )
+            else:
+                print(f"Parent area object {obj} already exists.")
+        except IntegrityError:
+            # Handle the case where a competition with the same id already exists
+            pass
+
+
+        
+    # Process areas
+    for areas_data in data['areas']:
+        try:
+            # Get the parent area object for this area, if it exists
+            try:
+                parent_area = parentArea.objects.get(parentAreaId=areas_data['parentAreaId'])
+            except parentArea.DoesNotExist:
+                parent_area = None
+
+            Area.objects.create(
+                id=areas_data['id'],
+                name=areas_data['name'],
+                code=areas_data['countryCode'],
+                flag=areas_data['flag'],
+                parentArea=parent_area,
+            )
+        except IntegrityError:
+            # Handle the case where a competition with the same id already exists
+            pass
+
+
     url = 'http://api.football-data.org/v4/competitions'
     headers = {'X-Auth-Token': '0104ea3ca43a4bd2a32bf841c5c1e107'}
     response = requests.get(url, headers=headers)
@@ -20,10 +69,26 @@ def fetch_and_create():
             Competition.objects.create(
                 id=competition_data['id'],
                 name=competition_data['name'],
+                area_id=competition_data['area']['id'],
+                area_name=competition_data['area']['name'],
+                area_code=competition_data['area']['code'],
+                area_flag=competition_data['area']['flag'],
+                code=competition_data['code'],
+                type=competition_data['type'],
+                emblem_url=competition_data['emblem'],
+                plan=competition_data['plan'],
+                current_season_id=competition_data['currentSeason']['id'],
+                current_season_start_date=competition_data['currentSeason']['startDate'],
+                current_season_end_date=competition_data['currentSeason']['endDate'],
+                current_season_current_matchday=competition_data['currentSeason']['currentMatchday'],
+                current_season_winner=competition_data['currentSeason']['winner'],
+                number_of_available_seasons=competition_data['numberOfAvailableSeasons'],
+                last_updated=competition_data['lastUpdated'],
             )
         except IntegrityError:
             # Handle the case where a competition with the same id already exists
             pass
+
 
     # Process teams
     url = 'http://api.football-data.org/v4/teams'
