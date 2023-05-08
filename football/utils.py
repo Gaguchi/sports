@@ -41,11 +41,13 @@ def fetch_and_create():
             except parentArea.DoesNotExist:
                 parent_area = None
 
+            flag_url = areas_data['flag'] if areas_data['flag'] else ''
+
             Area.objects.create(
                 id=areas_data['id'],
                 name=areas_data['name'],
                 code=areas_data['countryCode'],
-                flag=areas_data['flag'],
+                flag=flag_url,
                 parentArea=parent_area,
             )
         except IntegrityError:

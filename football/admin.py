@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import parentArea, Area, Competition, Season, Team, TeamCompetition, Fixture, Player
 
 
@@ -6,9 +7,14 @@ class parentAreaAdmin(admin.ModelAdmin):
     list_display = ('parentAreaId', 'parentArea')
 
 
-class AreaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'code', 'flag', 'parentArea')
 
+class AreaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'code', 'get_flag_image', 'parentArea')
+    
+    def get_flag_image(self, obj):
+        return format_html('<img src="{}" width="50" height="30" />', obj.flag)
+    
+    get_flag_image.short_description = 'Flag'
 
 class CompetitionAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'code', 'type', 'emblem', 'area', 'plan', 'current_season_id', 'last_updated')
