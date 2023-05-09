@@ -17,7 +17,12 @@ class AreaAdmin(admin.ModelAdmin):
     get_flag_image.short_description = 'Flag'
 
 class CompetitionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'code', 'type', 'emblem', 'area', 'plan', 'current_season_id', 'last_updated')
+    list_display = ('id', 'name', 'code', 'type', 'get_emblem_image', 'area', 'plan', 'current_season', 'last_updated')
+
+    def get_emblem_image(self, obj):
+        return format_html('<img src="{}" width="50" height="30" />', obj.emblem)
+    
+    get_emblem_image.short_description = 'Flag'
 
 
 class SeasonAdmin(admin.ModelAdmin):
@@ -25,7 +30,12 @@ class SeasonAdmin(admin.ModelAdmin):
 
 
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'short_name', 'tla', 'crest_url', 'address', 'website', 'founded', 'club_colors', 'venue', 'last_updated')
+    list_display = ('get_crest_image', 'short_name')
+
+    def get_crest_image(self, obj):
+        return format_html('<img src="{}" width="50" height="50" />', obj.crest)
+    
+    get_crest_image.short_description = 'Flag'
 
 
 class TeamCompetitionAdmin(admin.ModelAdmin):
