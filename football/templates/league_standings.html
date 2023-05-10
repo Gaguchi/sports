@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>League Standings Table</title>
+	<style>
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+			padding: 5px;
+		}
+		th {
+			background-color: #0074D9;
+			color: white;
+		}
+		tr:nth-child(even) {
+			background-color: #f2f2f2;
+		}
+	</style>
+</head>
+<body>
+	{% for competition, positions in standings.items %}
+<h2>{{ competition }}</h2>
+{% if positions %}
+<p>Showing top {{ limit }} teams:</p>
+<table>
+    <thead>
+        <tr>
+            <th>Position</th>
+            <th>Team</th>
+            <th>Played</th>
+            <th>Won</th>
+            <th>Drawn</th>
+            <th>Lost</th>
+            <th>GF</th>
+            <th>GA</th>
+            <th>GD</th>
+            <th>Points</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for position in positions %}
+        <tr>
+            <td>{{ position.position }}</td>
+            <td><img src="{{ position.team.crest }}" alt="{{ position.team.tla }}" width="30" height="30"> {{ position.team.name }}</td>
+            <td>{{ position.played }}</td>
+            <td>{{ position.won }}</td>
+            <td>{{ position.drawn }}</td>
+            <td>{{ position.lost }}</td>
+            <td>{{ position.goals_for }}</td>
+            <td>{{ position.goals_against }}</td>
+            <td>{{ position.goal_difference }}</td>
+            <td>{{ position.points }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No teams to display.</p>
+{% endif %}
+{% endfor %}
+
+</body>
+
+</html>
